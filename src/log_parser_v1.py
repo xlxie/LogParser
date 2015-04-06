@@ -40,8 +40,8 @@ def log_parse(log_file_name):
 	try:
 		file_obj = open(log_file_name, "r")
 	except IOError:
-		print "log file %s open failed\n"
-		sys.exit(1)
+		#print "log file %s open failed\n"%log_file_name
+		return {}
 
 	global_call_id = 0
 	while(1):
