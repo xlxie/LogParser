@@ -2,7 +2,9 @@
 
 import os,sys
 
-report_metric_list=["gpu_ipc",
+report_metric_list=["gpu_sim_cycle",
+"gpu_sim_insn",
+"gpu_ipc",
 "l1d_cache_hit",
 "l1d_cache_miss",
 "l1d_cache_access",
@@ -18,11 +20,9 @@ report_metric_list=["gpu_ipc",
 "W0_Scoreboard"
 ]
 
-accu_metric_list=["l1d_cache_hit",
-"l1d_cache_miss",
+accu_metric_list=["l1d_cache_miss",
 "l1d_cache_access",
 "l1d_cache_res_fail",
-"l2_cache_hit",
 "l2_cache_miss",
 "l2_cache_access",
 "l2_cache_res_fail",
@@ -62,82 +62,96 @@ def log_parse(log_file_name):
 					break
 				elif str_line.strip("\n") == "----------------------------END-of-Interconnect-DETAILS-------------------------":
 					break
-				
-				if str_line[0:len("gpu_ipc")] == "gpu_ipc":
+					
+				if str_line[0:len("gpu_sim_cycle")] == "gpu_sim_cycle":
 					tmp = 0.0
 					str_item = str_line.strip().split("=")[-1]
 					tmp = float(str_item)
 					raw_data_dic[global_call_id][report_metric_list[0]] = tmp
-				elif str_line[0:len("\tL1D_total_cache_accesses")] == "\tL1D_total_cache_accesses":
+				elif str_line[0:len("gpu_sim_insn")] == "gpu_sim_insn":
 					tmp = 0.0
 					str_item = str_line.strip().split("=")[-1]
 					tmp = float(str_item)
-					raw_data_dic[global_call_id][report_metric_list[3]] = tmp
-				elif str_line[0:len("\tL1D_total_cache_misses")] == "\tL1D_total_cache_misses":
+					raw_data_dic[global_call_id][report_metric_list[1]] = tmp
+				elif str_line[0:len("gpu_ipc")] == "gpu_ipc":
 					tmp = 0.0
 					str_item = str_line.strip().split("=")[-1]
 					tmp = float(str_item)
 					raw_data_dic[global_call_id][report_metric_list[2]] = tmp
-					tmp_hit = raw_data_dic[global_call_id][report_metric_list[3]] - raw_data_dic[global_call_id][report_metric_list[2]] 
-					raw_data_dic[global_call_id][report_metric_list[1]] = tmp_hit
-					raw_data_dic[global_call_id][report_metric_list[5]] = tmp_hit/(raw_data_dic[global_call_id][report_metric_list[3]]+0.01)
-				elif str_line[0:len("\tL1D_total_cache_reservation_fails")] == "\tL1D_total_cache_reservation_fails":
+				elif str_line[0:len("\tL1D_total_cache_accesses")] == "\tL1D_total_cache_accesses":
+					tmp = 0.0
+					str_item = str_line.strip().split("=")[-1]
+					tmp = float(str_item)
+					raw_data_dic[global_call_id][report_metric_list[5]] = tmp
+				elif str_line[0:len("\tL1D_total_cache_misses")] == "\tL1D_total_cache_misses":
 					tmp = 0.0
 					str_item = str_line.strip().split("=")[-1]
 					tmp = float(str_item)
 					raw_data_dic[global_call_id][report_metric_list[4]] = tmp
+				elif str_line[0:len("\tL1D_total_cache_reservation_fails")] == "\tL1D_total_cache_reservation_fails":
+					tmp = 0.0
+					str_item = str_line.strip().split("=")[-1]
+					tmp = float(str_item)
+					raw_data_dic[global_call_id][report_metric_list[6]] = tmp
 				elif str_line[0:len("Stall:")] == "Stall:":
 					str_item = str_line.split("\t")[0].split(":")[-1]
-					raw_data_dic[global_call_id][report_metric_list[11]] = float(str_item)
+					raw_data_dic[global_call_id][report_metric_list[13]] = float(str_item)
 					str_item = str_line.split("\t")[1].split(":")[-1]
 					try:
-						raw_data_dic[global_call_id][report_metric_list[12]] = float(str_item)
+						raw_data_dic[global_call_id][report_metric_list[14]] = float(str_item)
 					except ValueError:
 						print "log_file_name:%s"%log_file_name
 						print str_line
 						sys.exit(1)
 					str_item = str_line.split("\t")[2].split(":")[-1]
-					raw_data_dic[global_call_id][report_metric_list[13]] = float(str_item)
+					raw_data_dic[global_call_id][report_metric_list[15]] = float(str_item)
 				elif str_line[0:len("L2_total_cache_accesses")] == "L2_total_cache_accesses":
 					str_item = str_line.strip().split("=")[-1]
-					raw_data_dic[global_call_id][report_metric_list[8]] = float(str_item)
+					raw_data_dic[global_call_id][report_metric_list[10]] = float(str_item)
 				elif str_line[0:len("L2_total_cache_misses")] == "L2_total_cache_misses":
 					str_item = str_line.strip().split("=")[-1]
-					raw_data_dic[global_call_id][report_metric_list[7]] = float(str_item)
-					raw_data_dic[global_call_id][report_metric_list[6]] = raw_data_dic[global_call_id][report_metric_list[8]] - raw_data_dic[global_call_id][report_metric_list[7]]
-					raw_data_dic[global_call_id][report_metric_list[9]] = raw_data_dic[global_call_id][report_metric_list[6]]/(raw_data_dic[global_call_id][report_metric_list[8]]+0.01)
-
-					#print raw_data_dic[global_call_id][report_metric_list[9]]
+					raw_data_dic[global_call_id][report_metric_list[9]] = float(str_item)
 				elif str_line[0:len("L2_total_cache_reservation_fails")] == "L2_total_cache_reservation_fails":
 					str_item = str_line.strip().split("=")[-1]
-					raw_data_dic[global_call_id][report_metric_list[10]] = float(str_item)
+					raw_data_dic[global_call_id][report_metric_list[12]] = float(str_item)
+	
 	"""
 	for ite1 in raw_data_dic.keys():
 		print "ite1",ite1
-		for ite2 in raw_data_dic[ite1].keys():
-			print "\t",ite2,raw_data_dic[ite1][ite2]
+		for ite2 in report_metric_list:
+			if ite2 in raw_data_dic[ite1].keys():
+				print "\t",ite2,raw_data_dic[ite1][ite2]
 	"""
+	
 	#accu
 	gite = len(raw_data_dic.keys())
 	while gite>1:
 		for mite in accu_metric_list:
 			raw_data_dic[gite][mite] = raw_data_dic[gite][mite]-raw_data_dic[gite-1][mite]
 
-		raw_data_dic[gite][report_metric_list[5]] = raw_data_dic[gite][report_metric_list[1]]/(raw_data_dic[gite][report_metric_list[3]]+0.1)
-		raw_data_dic[gite][report_metric_list[9]] = raw_data_dic[gite][report_metric_list[6]]/(raw_data_dic[gite][report_metric_list[8]]+0.1)
+		#raw_data_dic[gite][report_metric_list[5]] = raw_data_dic[gite][report_metric_list[1]]/(raw_data_dic[gite][report_metric_list[3]]+0.1)
+		#raw_data_dic[gite][report_metric_list[9]] = raw_data_dic[gite][report_metric_list[6]]/(raw_data_dic[gite][report_metric_list[8]]+0.1)
 		gite = gite-1
-	
-	gite=1
 
-	raw_data_dic[gite][report_metric_list[5]] = raw_data_dic[gite][report_metric_list[1]]/(raw_data_dic[gite][report_metric_list[3]]+0.01)
-	raw_data_dic[gite][report_metric_list[9]] = raw_data_dic[gite][report_metric_list[6]]/(raw_data_dic[gite][report_metric_list[8]]+0.01)
+	#compute cache hits & cache hitrate
+	for gite in range(1,len(raw_data_dic.keys())+1):
+		#l1
+		#print gite
+		#print raw_data_dic[gite]
+		raw_data_dic[gite][report_metric_list[3]] = raw_data_dic[gite][report_metric_list[5]] - raw_data_dic[gite][report_metric_list[4]]
+		raw_data_dic[gite][report_metric_list[7]] = raw_data_dic[gite][report_metric_list[3]]/(raw_data_dic[gite][report_metric_list[5]]+0.01)
+		#l2
+		raw_data_dic[gite][report_metric_list[8]] = raw_data_dic[gite][report_metric_list[10]]-raw_data_dic[gite][report_metric_list[9]]
+		raw_data_dic[gite][report_metric_list[11]] = raw_data_dic[gite][report_metric_list[8]]/(raw_data_dic[gite][report_metric_list[10]]+0.01)
+	
 	"""
 	for ite1 in raw_data_dic.keys():
 		print "ite1",ite1
-		for ite2 in raw_data_dic[ite1].keys():
-			print "\t",ite2,raw_data_dic[ite1][ite2]
+		for ite2 in report_metric_list:
+			if ite2 in raw_data_dic[ite1].keys():
+				print "\t",ite2,raw_data_dic[ite1][ite2]
 	"""
-
+	
 	#trans
 	gite = 1
 	while gite <= len(raw_data_dic.keys()):
